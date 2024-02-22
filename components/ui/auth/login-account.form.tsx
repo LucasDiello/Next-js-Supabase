@@ -27,7 +27,7 @@ const formSchema = z.object({
     .max(12, { message: "Password must be at most 12 characters long." }),
 });
 
-export default function CreateAccountForm() {
+export default function LoginAccountForm() {
   const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -44,25 +44,22 @@ export default function CreateAccountForm() {
       const {
         error,
         data: { user },
-      } = await supabase.auth.signUp({
+      } = await supabase.auth.signInWithPassword({
         email,
         password,
-        options: {
-          emailRedirectTo: `${location.origin}/auth/callback`,
-        },
       });
       if (user) {
         form.reset();
-        router.push("/");
+        router.refresh();
       }
     } catch (e) {
-      console.error(e);
+      console.error("LoginAccountForm", e);
     }
   };
 
   return (
     <div className="flex flex-col justify-center items-center space-y-2">
-      <span className="text-lg">You will love it</span>
+      <span className="text-lg">{"It's good to see you again!"}</span>
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
@@ -100,7 +97,7 @@ export default function CreateAccountForm() {
               </FormItem>
             )}
           />
-          <Button type="submit">Create Account</Button>
+          <Button type="submit">Login</Button>
         </form>
       </Form>
     </div>

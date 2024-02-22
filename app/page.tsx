@@ -9,6 +9,7 @@ import {
   TabsTrigger,
 } from "@/components/ui/tabs"
 import CreateAccountForm from "@/components/ui/auth/create-account-form";
+import LoginAccountForm from "@/components/ui/auth/login-account.form";
 
 
 export default async function page() {
@@ -36,7 +37,7 @@ export default async function page() {
       <CreateAccountForm />
       </TabsContent>
       <TabsContent value="login">
-
+      <LoginAccountForm />
       </TabsContent>
     </Tabs>
     </div>
