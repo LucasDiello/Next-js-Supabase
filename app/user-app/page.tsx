@@ -5,6 +5,11 @@ import { cookies } from 'next/headers';
 import { RedirectType } from 'next/dist/client/components/redirect';
 import UserAppHeader from '@/components/user-app/user-app-header';
 import { Sidebar } from '@/components/user-app/user-app-sidebar';
+import { Button } from '@/components/ui/button';
+import { PlusCircleIcon } from 'lucide-react';
+import { Separator } from '@/components/ui/separator';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ImageUploadPlaceholder } from '@/components/user-app/img-uploader-placeholder';
 
 export default async function page() {
   let loggedIn = false;
@@ -24,9 +29,9 @@ export default async function page() {
   
   return (
     <>
-      <div className="hidden md:block">
+      <div>
         {/* <Menu /> */}
-        {<UserAppHeader />}
+        <UserAppHeader />
         <div className="border-t">
           <div className="bg-background">
             <div className="grid lg:grid-cols-5">
@@ -34,41 +39,42 @@ export default async function page() {
               <Sidebar className='hidden md:block' />
               <div className="col-span-3 lg:col-span-4 lg:border-l">
                 <div className="h-full px-4 py-6 lg:px-8">
-                  {/* <Tabs defaultValue="music" className="h-full space-y-6">
+                  <Tabs defaultValue="music" className="h-full space-y-6">
                     <div className="space-between flex items-center">
                       <TabsList>
-                        <TabsTrigger value="music" className="relative">
-                          Music
+                        <TabsTrigger value="photos" className="relative">
+                          Photos
                         </TabsTrigger>
-                        <TabsTrigger value="podcasts">Podcasts</TabsTrigger>
-                        <TabsTrigger value="live" disabled>
-                          Live
+                        <TabsTrigger value="documents">Documents</TabsTrigger>
+                        <TabsTrigger value="other" disabled>
+                          Other
                         </TabsTrigger>
                       </TabsList>
                       <div className="ml-auto mr-4">
                         <Button>
-                          <PlusCircledIcon className="mr-2 h-4 w-4" />
-                          Add music
+                          <PlusCircleIcon className="mr-2 h-4 w-4" />
+                          Add Colleciton
                         </Button>
                       </div>
                     </div>
                     <TabsContent
-                      value="music"
+                      value="photos"
                       className="border-none p-0 outline-none"
                     >
                       <div className="flex items-center justify-between">
                         <div className="space-y-1">
                           <h2 className="text-2xl font-semibold tracking-tight">
-                            Listen Now
+                            Photo Collection
                           </h2>
                           <p className="text-sm text-muted-foreground">
-                            Top picks for you. Updated daily.
+                            The photos you already enhanced.
                           </p>
                         </div>
                       </div>
                       <Separator className="my-4" />
-                      <div className="relative">
-                        <ScrollArea>
+                      <div className="relative w-full">
+                        <ImageUploadPlaceholder />
+                        {/* <ScrollArea>
                           <div className="flex space-x-4 pb-4">
                             {listenNowAlbums.map((album) => (
                               <AlbumArtwork
@@ -82,7 +88,7 @@ export default async function page() {
                             ))}
                           </div>
                           <ScrollBar orientation="horizontal" />
-                        </ScrollArea>
+                        </ScrollArea> */}
                       </div>
                       <div className="mt-6 space-y-1">
                         <h2 className="text-2xl font-semibold tracking-tight">
@@ -94,7 +100,7 @@ export default async function page() {
                       </div>
                       <Separator className="my-4" />
                       <div className="relative">
-                        <ScrollArea>
+                        {/* <ScrollArea>
                           <div className="flex space-x-4 pb-4">
                             {madeForYouAlbums.map((album) => (
                               <AlbumArtwork
@@ -108,11 +114,11 @@ export default async function page() {
                             ))}
                           </div>
                           <ScrollBar orientation="horizontal" />
-                        </ScrollArea>
+                        </ScrollArea> */}
                       </div>
                     </TabsContent>
                     <TabsContent
-                      value="podcasts"
+                      value="documents"
                       className="h-full flex-col border-none p-0 data-[state=active]:flex"
                     >
                       <div className="flex items-center justify-between">
@@ -126,9 +132,9 @@ export default async function page() {
                         </div>
                       </div>
                       <Separator className="my-4" />
-                      <PodcastEmptyPlaceholder />
+                      {/* <PodcastEmptyPlaceholder /> */}
                     </TabsContent>
-                  </Tabs> */}
+                  </Tabs>
                 </div>
               </div>
             </div>
