@@ -41,7 +41,6 @@ export async function POST(req: NextRequestWithImage, res: NextResponse) {
     let jsonStartProcess = await startRestoreProcess.json();
     let restoredImage = jsonStartProcess.data.output.tmp_url;
 
-    const response = await fetch(restoredImage);
 
     return NextResponse.json({data: restoredImage ? restoredImage : "failed to restored"}, {status: 200})
 }

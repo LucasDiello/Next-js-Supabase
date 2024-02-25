@@ -17,7 +17,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 
 interface FilePreview {
-  file: Blob;
+  file: Blob | any;
   preview: string;
 }
 
@@ -30,14 +30,13 @@ export function ImageUploadPlaceholder() {
   const onDrop = useCallback(async (acceptedFiles: File[]) => {
     try {
       const file = acceptedFiles[0];
-      console.log(file);
       setFile({
         file,
         preview: URL.createObjectURL(file),
       });
       const supabase = createClientComponentClient();
       const { data, error } = await supabase.storage.from(process.env.NEXT_PUBLIC_SUPABASE_APP_BUCKET_IMAGE_FOLDER)
-        .upload(`${process.env.NEXT_PUBLIC_SUPABASE_APP_BUCKET_IMAGE_FOLDER_PROCESSING}/${file.name}`, file);
+        .upload(`${process.env.NEXT_PUBLIC_SUPABASE_APP_BUCKET_IMAGE_FOLDER_PROCESSING}/${acceptedFiles[0].name}`, acceptedFiles[0]);
 
         if (!error) {
         setFileToProcess(data);
@@ -76,7 +75,6 @@ export function ImageUploadPlaceholder() {
     try {
       const supabase = createClientComponentClient();
       
-      console.log(fileToProcess?.path)
       const { data: { publicUrl } } = await supabase.storage.from(process.env.NEXT_PUBLIC_SUPABASE_APP_BUCKET_IMAGE_FOLDER)
         .getPublicUrl(`${fileToProcess?.path}`);
 
@@ -93,14 +91,14 @@ export function ImageUploadPlaceholder() {
 
       const blob = restoredImageUrl.data;
 
-      console.log(blob);
       setRestoredFile({
         file: blob,
         preview: blob,
       });
 
+      
       const { data: uploadData, error: uploadError } = await supabase.storage.from(process.env.NEXT_PUBLIC_SUPABASE_APP_BUCKET_IMAGE_FOLDER)
-        .upload(`${process.env.NEXT_PUBLIC_SUPABASE_APP_BUCKET_IMAGE_FOLDER_RESTORED}/${file?.file.type}`, blob);
+        .upload(`${process.env.NEXT_PUBLIC_SUPABASE_APP_BUCKET_IMAGE_FOLDER_RESTORED}/image/${file?.file?.name}`, blob);
 
       if (uploadError) {
         setRestoredFile(null);

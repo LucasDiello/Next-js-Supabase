@@ -1,32 +1,73 @@
-import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
-import {redirect } from 'next/navigation';
-import React from 'react'
-import { cookies } from 'next/headers';
-import { RedirectType } from 'next/dist/client/components/redirect';
-import UserAppHeader from '@/components/user-app/user-app-header';
-import { Sidebar } from '@/components/user-app/user-app-sidebar';
-import { Button } from '@/components/ui/button';
-import { PlusCircleIcon } from 'lucide-react';
-import { Separator } from '@/components/ui/separator';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ImageUploadPlaceholder } from '@/components/user-app/img-uploader-placeholder';
+import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
+import { redirect } from "next/navigation";
+import React from "react";
+import { cookies } from "next/headers";
+import { RedirectType } from "next/dist/client/components/redirect";
+import UserAppHeader from "@/components/user-app/user-app-header";
+import { Sidebar } from "@/components/user-app/user-app-sidebar";
+import { Button } from "@/components/ui/button";
+import { PlusCircleIcon } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ImageUploadPlaceholder } from "@/components/user-app/img-uploader-placeholder";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import Image from "next/image";
+import { AlbumArtwork } from "@/components/user-app/user-app-image";
 
 export default async function page() {
   let loggedIn = false;
 
+  const supabase = createServerComponentClient({ cookies });
   try {
-    const supabase = createServerComponentClient({cookies});
-    const { data: { session } } = await supabase.auth.getSession()
-    if(session) {
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+    if (session) {
       loggedIn = true;
     }
-  }
-  catch (e) {
+  } catch (e) {
     console.log("UserApp", e);
   } finally {
     if (!loggedIn) redirect("/", RedirectType.replace);
   }
-  
+
+  const { data, error } = await supabase.storage
+    .from(`images`)
+    .list(
+      `${process.env.NEXT_PUBLIC_SUPABASE_APP_BUCKET_IMAGE_FOLDER_RESTORED}/image`
+    );
+
+  const publicUrlRequest = data?.map((image) => {
+    const {
+      data: { publicUrl },
+    } = supabase.storage
+      .from(process.env.NEXT_PUBLIC_SUPABASE_APP_BUCKET_IMAGE_FOLDER)
+      .getPublicUrl(
+        `${process.env.NEXT_PUBLIC_SUPABASE_APP_BUCKET_IMAGE_FOLDER_RESTORED}/image/${image.name}`
+      );
+    return publicUrl;
+  });
+
+  const publicUrl = publicUrlRequest?.map(async (url) => {
+    try {
+      const response = await fetch(url);
+      if (response.statusText === "OK") {
+        const text = await response.text();
+        return text;
+      } else {
+        console.log("Failed to fetch:", response.status);
+      }
+    } catch (error) {
+      console.error("Error fetching the URL:", error);
+    }
+  });
+
+
+  const imagesRestored = await Promise.all(publicUrl as any);
+
+  console.log("data", data);
+  console.log("imagesRestored",imagesRestored);
+
   return (
     <>
       <div>
@@ -36,7 +77,7 @@ export default async function page() {
           <div className="bg-background">
             <div className="grid lg:grid-cols-5">
               {/* <Sidebar playlists={playlists} className="hidden lg:block" /> */}
-              <Sidebar className='hidden md:block' />
+              <Sidebar className="hidden md:block" />
               <div className="col-span-3 lg:col-span-4 lg:border-l">
                 <div className="h-full px-4 py-6 lg:px-8">
                   <Tabs defaultValue="photos" className="h-full space-y-6">
@@ -74,21 +115,6 @@ export default async function page() {
                       <Separator className="my-4" />
                       <div className="relative w-full">
                         <ImageUploadPlaceholder />
-                        {/* <ScrollArea>
-                          <div className="flex space-x-4 pb-4">
-                            {listenNowAlbums.map((album) => (
-                              <AlbumArtwork
-                                key={album.name}
-                                album={album}
-                                className="w-[250px]"
-                                aspectRatio="portrait"
-                                width={250}
-                                height={330}
-                              />
-                            ))}
-                          </div>
-                          <ScrollBar orientation="horizontal" />
-                        </ScrollArea> */}
                       </div>
                       <div className="mt-6 space-y-1">
                         <h2 className="text-2xl font-semibold tracking-tight">
@@ -100,21 +126,15 @@ export default async function page() {
                       </div>
                       <Separator className="my-4" />
                       <div className="relative">
-                        {/* <ScrollArea>
+                        <ScrollArea>
                           <div className="flex space-x-4 pb-4">
-                            {madeForYouAlbums.map((album) => (
-                              <AlbumArtwork
-                                key={album.name}
-                                album={album}
-                                className="w-[150px]"
-                                aspectRatio="square"
-                                width={150}
-                                height={150}
-                              />
-                            ))}
+                            {
+                              imagesRestored?.map((image) => (
+                                <AlbumArtwork key={image} publicUrl={image} />
+                              ))
+                            }
                           </div>
-                          <ScrollBar orientation="horizontal" />
-                        </ScrollArea> */}
+                        </ScrollArea>
                       </div>
                     </TabsContent>
                     <TabsContent
@@ -142,5 +162,5 @@ export default async function page() {
         </div>
       </div>
     </>
-  )
+  );
 }
