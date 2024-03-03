@@ -11,7 +11,7 @@ export default async function page() {
   const { data }: { data: any } = await supabase.storage
     .from(`images`)
     .list(
-      `${process.env.NEXT_PUBLIC_SUPABASE_APP_BUCKET_IMAGE_FOLDER_RESTORED}/image`
+      `${process.env.NEXT_PUBLIC_SUPABASE_APP_BUCKET_IMAGE_FOLDER_RESTORED}/image/${userName}`
     );
 
   const publicUrlRequest: any = data?.map((image: any) => {
@@ -20,7 +20,7 @@ export default async function page() {
     } = supabase.storage
       .from(process.env.NEXT_PUBLIC_SUPABASE_APP_BUCKET_IMAGE_FOLDER)
       .getPublicUrl(
-        `${process.env.NEXT_PUBLIC_SUPABASE_APP_BUCKET_IMAGE_FOLDER_RESTORED}/image/${image.name}`
+        `${process.env.NEXT_PUBLIC_SUPABASE_APP_BUCKET_IMAGE_FOLDER_RESTORED}/image/${userName}/${image.name}`
       );
     return publicUrl;
   });

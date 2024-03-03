@@ -28,15 +28,18 @@ export function ImageUploadPlaceholder() {
   const router = useRouter();
   
   const onDrop = useCallback(async (acceptedFiles: File[]) => {
+    const supabase = createClientComponentClient();
+    const {data: { user } } = await supabase.auth.getUser();
+    const userName = user?.email?.split("@")[0];
     try {
       const file = acceptedFiles[0];
       setFile({
         file,
         preview: URL.createObjectURL(file),
       });
-      const supabase = createClientComponentClient();
+
       const { data, error } = await supabase.storage.from(process.env.NEXT_PUBLIC_SUPABASE_APP_BUCKET_IMAGE_FOLDER)
-        .upload(`${process.env.NEXT_PUBLIC_SUPABASE_APP_BUCKET_IMAGE_FOLDER_PROCESSING}/${acceptedFiles[0].name}`, acceptedFiles[0]);
+        .upload(`${process.env.NEXT_PUBLIC_SUPABASE_APP_BUCKET_IMAGE_FOLDER_PROCESSING}/${userName}/${acceptedFiles[0].name}`, acceptedFiles[0]);
 
         if (!error) {
         setFileToProcess(data);
@@ -72,10 +75,11 @@ export function ImageUploadPlaceholder() {
   };
 
   const handleEnhance = async () => {
+    const supabase = createClientComponentClient();
+    const {data: { user } } = await supabase.auth.getUser();
+    const userName = user?.email?.split("@")[0];
     try {
-      const supabase = createClientComponentClient();
-      
-      const { data: { publicUrl } } = await supabase.storage.from(process.env.NEXT_PUBLIC_SUPABASE_APP_BUCKET_IMAGE_FOLDER)
+      const { data: { publicUrl } } = supabase.storage.from(`images/`)
         .getPublicUrl(`${fileToProcess?.path}`);
 
       const response = await fetch("/api/ai/replicate", {
@@ -98,7 +102,7 @@ export function ImageUploadPlaceholder() {
 
       
       const { data: uploadData, error: uploadError } = await supabase.storage.from(process.env.NEXT_PUBLIC_SUPABASE_APP_BUCKET_IMAGE_FOLDER)
-        .upload(`${process.env.NEXT_PUBLIC_SUPABASE_APP_BUCKET_IMAGE_FOLDER_RESTORED}/image/${file?.file?.name}`, blob);
+        .upload(`${process.env.NEXT_PUBLIC_SUPABASE_APP_BUCKET_IMAGE_FOLDER_RESTORED}/image/${userName}/${file?.file?.name}`, blob);
 
       if (uploadError) {
         setRestoredFile(null);

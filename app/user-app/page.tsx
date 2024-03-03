@@ -37,7 +37,7 @@ export default async function page() {
   const { data } : {data: any}= await supabase.storage
     .from(`images`)
     .list(
-      `${process.env.NEXT_PUBLIC_SUPABASE_APP_BUCKET_IMAGE_FOLDER_RESTORED}/image`
+      `${process.env.NEXT_PUBLIC_SUPABASE_APP_BUCKET_IMAGE_FOLDER_RESTORED}/image/${userName}`
     );
 
   const { data: dataCollections } : {data: any}= await supabase.storage.from(`images`).list(`${process.env.NEXT_PUBLIC_SUPABASE_APP_BUCKET_IMAGE_FOLDER_COLLECTIONS}/${userName}`);
@@ -48,7 +48,7 @@ export default async function page() {
     } = supabase.storage
       .from(process.env.NEXT_PUBLIC_SUPABASE_APP_BUCKET_IMAGE_FOLDER)
       .getPublicUrl(
-        `${process.env.NEXT_PUBLIC_SUPABASE_APP_BUCKET_IMAGE_FOLDER_RESTORED}/image/${image.name}`
+        `${process.env.NEXT_PUBLIC_SUPABASE_APP_BUCKET_IMAGE_FOLDER_RESTORED}/image/${userName}/${image.name}`
       );
     return publicUrl;
   });
@@ -156,10 +156,11 @@ export default async function page() {
                       </div>
                       <div className="mt-6 space-y-1">
                         <h2 className="text-2xl font-semibold tracking-tight">
-                          Made for community
+                          Made for you
                         </h2>
                         <p className="text-sm text-muted-foreground">
-                          The photos are made by the community.
+                          Here are the images that have been restored for you. You
+                          can view.
                         </p>
                         <p className="text-sm text-muted-foreground">
                          (Click with the right button to download and others options)
