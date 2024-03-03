@@ -1,6 +1,6 @@
-import Image from "next/image"
-
-import { cn } from "@/lib/utils"
+"use client";
+import Image from "next/image";
+import { cn } from "@/lib/utils";
 import {
   ContextMenu,
   ContextMenuContent,
@@ -10,27 +10,65 @@ import {
   ContextMenuSubContent,
   ContextMenuSubTrigger,
   ContextMenuTrigger,
-} from "@/components/ui/context-menu"
-import { PlusCircleIcon } from "lucide-react"
-import { restoredImage } from "@/types"
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
-
+} from "@/components/ui/context-menu";
+import { Heart, PlusCircleIcon, ThumbsDown, ThumbsUp } from "lucide-react";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 interface AlbumArtworkProps extends React.HTMLAttributes<HTMLDivElement> {
-  aspectRatio?: "portrait" | "square"
-  publicUrl: string
+  aspectRatio?: "portrait" | "square";
+  publicUrl: any;
+  nameImage: string;
+  userName: string;
 }
 
 export function AlbumArtwork({
   aspectRatio = "portrait",
+  nameImage,
   publicUrl,
   className,
+  userName,
   ...props
 }: AlbumArtworkProps) {
+  const router = useRouter();
+  const [liked, setLiked] = useState(false);
+  const supabase = createClientComponentClient();
 
-    const downloadImage = (nameImage: string) => {
-        return null
-    };
+  const handleDelete = async (nameImage: string) => {
+    console.log("handleDelete", nameImage);
+    const { error } = await supabase.storage
+      .from(process.env.NEXT_PUBLIC_SUPABASE_APP_BUCKET_IMAGE_FOLDER)
+      .remove([
+        `${process.env.NEXT_PUBLIC_SUPABASE_APP_BUCKET_IMAGE_FOLDER_RESTORED}/image/${nameImage}`,
+      ]);
+    const { error: erro2 } = await supabase.storage
+      .from(process.env.NEXT_PUBLIC_SUPABASE_APP_BUCKET_IMAGE_FOLDER)
+      .remove([
+        `${process.env.NEXT_PUBLIC_SUPABASE_APP_BUCKET_IMAGE_FOLDER_PROCESSING}/${nameImage}`,
+      ]);
+
+    router.refresh();
+
+    if (error || erro2) {
+      console.error("AlbumArtwork", error, erro2);
+    }
+  };
+
+  const handleMyCollection = async () => {
+    const { error } = await supabase.storage.from(process.env.NEXT_PUBLIC_SUPABASE_APP_BUCKET_IMAGE_FOLDER).upload(
+      `${process.env.NEXT_PUBLIC_SUPABASE_APP_BUCKET_IMAGE_FOLDER_COLLECTIONS}/${userName}/${nameImage}`,
+      publicUrl
+    )
+
+    router.refresh();
+
+    if (error) {
+      console.error("MyCollections", error);
+    }
+
+
+  }
 
   return (
     <div className={cn("space-y-3", className)} {...props}>
@@ -42,6 +80,7 @@ export function AlbumArtwork({
               alt={publicUrl}
               width={300}
               height={300}
+              priority={true}
               className={cn(
                 "h-auto w-auto object-contain transition-all hover:scale-105",
                 aspectRatio === "portrait" ? "aspect-[3/4]" : "aspect-square"
@@ -50,7 +89,9 @@ export function AlbumArtwork({
           </div>
         </ContextMenuTrigger>
         <ContextMenuContent className="w-40">
-          <ContextMenuItem>Add to Collection</ContextMenuItem>
+          <ContextMenuItem onClick={handleMyCollection}>
+            Add to Collection
+          </ContextMenuItem>
           <ContextMenuSub>
             <ContextMenuSubTrigger>Add to Photos</ContextMenuSubTrigger>
             <ContextMenuSubContent className="w-48">
@@ -59,38 +100,31 @@ export function AlbumArtwork({
                 New Collection
               </ContextMenuItem>
               <ContextMenuSeparator />
-              {/* {playlists.map((playlist) => (
-                <ContextMenuItem key={playlist}>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    className="mr-2 h-4 w-4"
-                    viewBox="0 0 24 24"
-                  >
-                    <path d="M21 15V6M18.5 18a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5ZM12 12H3M16 6H3M12 18H3" />
-                  </svg>
-                  {playlist}
-                </ContextMenuItem>
-              ))} */}
             </ContextMenuSubContent>
           </ContextMenuSub>
           <ContextMenuSeparator />
-          <ContextMenuItem>Delete</ContextMenuItem>
+          <ContextMenuItem
+            onClick={() => {
+              handleDelete(nameImage);
+            }}
+          >
+            Delete
+          </ContextMenuItem>
           <ContextMenuItem>Duplicate</ContextMenuItem>
-          <ContextMenuSeparator />
-          <ContextMenuItem>Download</ContextMenuItem>
-          <ContextMenuSeparator />
-          <ContextMenuItem>Like</ContextMenuItem>
+          <ContextMenuItem
+            onClick={() => {
+              setLiked(!liked);
+            }}
+          >
+            {liked ? "Unlike" : "Like"}{" "}
+          </ContextMenuItem>
           <ContextMenuItem>Share</ContextMenuItem>
         </ContextMenuContent>
       </ContextMenu>
-      <div className="space-y-1 text-sm">
-        <h3 className="font-medium leading-none">nome da imagem</h3>
+      <div className="space-y-1 text-sm flex justify-between items-center">
+        <p>made in: <span className="font-bold">{userName}</span></p>
+        {liked ? <ThumbsUp/> : <ThumbsDown/>}
       </div>
     </div>
-  )
+  );
 }

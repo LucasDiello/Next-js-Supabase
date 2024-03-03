@@ -18,6 +18,9 @@ export default async function page() {
   let loggedIn = false;
 
   const supabase = createServerComponentClient({ cookies });
+  const {data: {user}} = await supabase.auth.getUser() 
+  const userName = user?.email?.split("@")[0];
+
   try {
     const {
       data: { session },
@@ -31,13 +34,15 @@ export default async function page() {
     if (!loggedIn) redirect("/", RedirectType.replace);
   }
 
-  const { data, error } = await supabase.storage
+  const { data } : {data: any}= await supabase.storage
     .from(`images`)
     .list(
       `${process.env.NEXT_PUBLIC_SUPABASE_APP_BUCKET_IMAGE_FOLDER_RESTORED}/image`
     );
 
-  const publicUrlRequest = data?.map((image) => {
+  const { data: dataCollections } : {data: any}= await supabase.storage.from(`images`).list(`${process.env.NEXT_PUBLIC_SUPABASE_APP_BUCKET_IMAGE_FOLDER_COLLECTIONS}/${userName}`);
+
+  const publicUrlRequest : any = data?.map((image : any) => {
     const {
       data: { publicUrl },
     } = supabase.storage
@@ -48,9 +53,20 @@ export default async function page() {
     return publicUrl;
   });
 
-  const publicUrl = publicUrlRequest?.map(async (url) => {
+  const publicUrlRequestImagesCollection : any = dataCollections?.map((image : any) => {
+    const {
+      data: { publicUrl },
+    } = supabase.storage
+      .from(process.env.NEXT_PUBLIC_SUPABASE_APP_BUCKET_IMAGE_FOLDER)
+      .getPublicUrl(
+        `${process.env.NEXT_PUBLIC_SUPABASE_APP_BUCKET_IMAGE_FOLDER_COLLECTIONS}/${userName}/${image.name}`
+      );
+    return publicUrl;
+  });
+
+  const publicUrls = await Promise.all(publicUrlRequest.map(async (url : String) => {
     try {
-      const response = await fetch(url);
+      const response = await fetch(url as string);
       if (response.statusText === "OK") {
         const text = await response.text();
         return text;
@@ -60,23 +76,45 @@ export default async function page() {
     } catch (error) {
       console.error("Error fetching the URL:", error);
     }
+  }));
+
+  const publicUrlsImagesCollection = await Promise.all(publicUrlRequestImagesCollection.map(async (url : String) => {
+    try {
+      const response = await fetch(url as string);
+      if (response.statusText === "OK") {
+        const text = await response.text();
+        return text;
+      } else {
+        console.log("Failed to fetch:", response.status);
+      }
+    } catch (error) {
+      console.error("Error fetching the URL:", error);
+    }
+  }));
+
+  const imagesCollections = publicUrlsImagesCollection.map((text, index) => {
+    return {
+      name: dataCollections[index].name,
+      publicUrl: text,
+    };
   });
 
-
-  const imagesRestored = await Promise.all(publicUrl as any);
-
-  console.log("data", data);
-  console.log("imagesRestored",imagesRestored);
+  console.log(imagesCollections);
+  
+  const imagesRestored = publicUrls.map((text, index) => {
+    return {
+      name: data[index].name,
+      publicUrl: text,
+    };
+  });
 
   return (
     <>
       <div>
-        {/* <Menu /> */}
         <UserAppHeader />
         <div className="border-t">
           <div className="bg-background">
             <div className="grid lg:grid-cols-5">
-              {/* <Sidebar playlists={playlists} className="hidden lg:block" /> */}
               <Sidebar className="hidden md:block" />
               <div className="col-span-3 lg:col-span-4 lg:border-l">
                 <div className="h-full px-4 py-6 lg:px-8">
@@ -86,7 +124,7 @@ export default async function page() {
                         <TabsTrigger value="photos" className="relative">
                           Photos
                         </TabsTrigger>
-                        <TabsTrigger value="documents">Documents</TabsTrigger>
+                        <TabsTrigger value="collections">My collection</TabsTrigger>
                         <TabsTrigger value="other" disabled>
                           Other
                         </TabsTrigger>
@@ -118,19 +156,24 @@ export default async function page() {
                       </div>
                       <div className="mt-6 space-y-1">
                         <h2 className="text-2xl font-semibold tracking-tight">
-                          Made for You
+                          Made for community
                         </h2>
                         <p className="text-sm text-muted-foreground">
-                          Your personal playlists. Updated daily.
+                          The photos are made by the community.
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                         (Click with the right button to download and others options)
                         </p>
                       </div>
                       <Separator className="my-4" />
                       <div className="relative">
                         <ScrollArea>
-                          <div className="flex space-x-4 pb-4">
+                          <div className="flex space-x-4 pb-4 flex-wrap">
                             {
-                              imagesRestored?.map((image) => (
-                                <AlbumArtwork key={image} publicUrl={image} />
+                              imagesRestored?.map((image, index) => (
+                                <AlbumArtwork key={index} publicUrl={image.publicUrl}
+                                 nameImage={image.name}
+                                 userName={userName || ""} />
                               ))
                             }
                           </div>
@@ -138,21 +181,30 @@ export default async function page() {
                       </div>
                     </TabsContent>
                     <TabsContent
-                      value="documents"
+                      value="collections"
                       className="h-full flex-col border-none p-0 data-[state=active]:flex"
                     >
                       <div className="flex items-center justify-between">
                         <div className="space-y-1">
                           <h2 className="text-2xl font-semibold tracking-tight">
-                            New Episodes
+                            Your Collections
                           </h2>
                           <p className="text-sm text-muted-foreground">
-                            Your favorite podcasts. Updated daily.
+                            The collections you already created.
                           </p>
                         </div>
                       </div>
                       <Separator className="my-4" />
-                      {/* <PodcastEmptyPlaceholder /> */}
+                      <div className="flex space-x-4 pb-4 flex-wrap">
+                          {
+                            imagesCollections?.map((image, index) => (
+                              <AlbumArtwork key={index} publicUrl={image.publicUrl}
+                               nameImage={image.name}
+                               userName={userName || ""} />
+                            ))
+                          
+                          }
+                          </div>
                     </TabsContent>
                   </Tabs>
                 </div>

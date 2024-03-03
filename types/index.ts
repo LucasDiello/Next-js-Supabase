@@ -6,6 +6,6 @@ interface FileObject {
     created_at: string;
     last_accessed_at: string;
     metadata: Record<string, unknown>;
-}
+};
 
 export type restoredImage = FileObject;

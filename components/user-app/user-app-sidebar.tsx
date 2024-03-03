@@ -1,5 +1,9 @@
+"use client"
+
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
+import { useState } from "react"
+import { useRouter } from "next/navigation"
 
 
 interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -7,6 +11,8 @@ interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 export function Sidebar({ className }: SidebarProps) {
+  const router = useRouter();
+  
   return (
     <div className={cn("pb-12", className)}>
       <div className="space-y-4 py-4">
@@ -16,7 +22,9 @@ export function Sidebar({ className }: SidebarProps) {
           </h2>
           <div className="space-y-1">
 
-            <Button variant="ghost" className="w-full justify-start">
+            <Button variant="ghost" className="w-full justify-start" onClick={
+              () => router.push("/user-app")
+            }>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
@@ -32,7 +40,7 @@ export function Sidebar({ className }: SidebarProps) {
                 <rect width="7" height="7" x="14" y="14" rx="1" />
                 <rect width="7" height="7" x="3" y="14" rx="1" />
               </svg>
-              Browse
+              Main page
             </Button>
             <Button variant="ghost" className="w-full justify-start">
               <svg
@@ -76,7 +84,7 @@ export function Sidebar({ className }: SidebarProps) {
               </svg>
               Songs
             </Button>
-            <Button variant="ghost" className="w-full justify-start">
+            <Button variant="ghost" className="w-full justify-start" onClick={() => router.push("/user-made-for-you")}>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
@@ -127,11 +135,6 @@ export function Sidebar({ className }: SidebarProps) {
               Albums
             </Button>
           </div>
-        </div>
-        <div className="py-2">
-          <h2 className="relative px-7 text-lg font-semibold tracking-tight">
-            Playlists
-          </h2>
         </div>
       </div>
     </div>
