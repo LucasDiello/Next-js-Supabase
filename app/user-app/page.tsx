@@ -11,8 +11,9 @@ import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ImageUploadPlaceholder } from "@/components/user-app/img-uploader-placeholder";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import Image from "next/image";
 import { AlbumArtwork } from "@/components/user-app/user-app-image";
+import handleStorage from "@/lib/handleStorage";
+import Footer from "@/components/footer/footer";
 
 export default async function page() {
   let loggedIn = false;
@@ -34,79 +35,13 @@ export default async function page() {
     if (!loggedIn) redirect("/", RedirectType.replace);
   }
 
-  const { data } : {data: any}= await supabase.storage
-    .from(`images`)
-    .list(
-      `${process.env.NEXT_PUBLIC_SUPABASE_APP_BUCKET_IMAGE_FOLDER_RESTORED}/image/${userName}`
-    );
-
-  const { data: dataCollections } : {data: any}= await supabase.storage.from(`images`).list(`${process.env.NEXT_PUBLIC_SUPABASE_APP_BUCKET_IMAGE_FOLDER_COLLECTIONS}/${userName}`);
-
-  const publicUrlRequest : any = data?.map((image : any) => {
-    const {
-      data: { publicUrl },
-    } = supabase.storage
-      .from(process.env.NEXT_PUBLIC_SUPABASE_APP_BUCKET_IMAGE_FOLDER)
-      .getPublicUrl(
-        `${process.env.NEXT_PUBLIC_SUPABASE_APP_BUCKET_IMAGE_FOLDER_RESTORED}/image/${userName}/${image.name}`
-      );
-    return publicUrl;
-  });
-
-  const publicUrlRequestImagesCollection : any = dataCollections?.map((image : any) => {
-    const {
-      data: { publicUrl },
-    } = supabase.storage
-      .from(process.env.NEXT_PUBLIC_SUPABASE_APP_BUCKET_IMAGE_FOLDER)
-      .getPublicUrl(
-        `${process.env.NEXT_PUBLIC_SUPABASE_APP_BUCKET_IMAGE_FOLDER_COLLECTIONS}/${userName}/${image.name}`
-      );
-    return publicUrl;
-  });
-
-  const publicUrls = await Promise.all(publicUrlRequest.map(async (url : String) => {
-    try {
-      const response = await fetch(url as string);
-      if (response.statusText === "OK") {
-        const text = await response.text();
-        return text;
-      } else {
-        console.log("Failed to fetch:", response.status);
-      }
-    } catch (error) {
-      console.error("Error fetching the URL:", error);
-    }
-  }));
-
-  const publicUrlsImagesCollection = await Promise.all(publicUrlRequestImagesCollection.map(async (url : String) => {
-    try {
-      const response = await fetch(url as string);
-      if (response.statusText === "OK") {
-        const text = await response.text();
-        return text;
-      } else {
-        console.log("Failed to fetch:", response.status);
-      }
-    } catch (error) {
-      console.error("Error fetching the URL:", error);
-    }
-  }));
-
-  const imagesCollections = publicUrlsImagesCollection.map((text, index) => {
-    return {
-      name: dataCollections[index].name,
-      publicUrl: text,
-    };
-  });
+  const imagesCollections = await handleStorage(process.env.NEXT_PUBLIC_SUPABASE_APP_BUCKET_IMAGE_FOLDER_COLLECTIONS,
+    process.env.NEXT_PUBLIC_SUPABASE_APP_BUCKET_IMAGE_FOLDER_COLLECTIONS,
+    true)
 
   console.log(imagesCollections);
   
-  const imagesRestored = publicUrls.map((text, index) => {
-    return {
-      name: data[index].name,
-      publicUrl: text,
-    };
-  });
+  const imagesRestored = await handleStorage(process.env.NEXT_PUBLIC_SUPABASE_APP_BUCKET_IMAGE_FOLDER_RESTORED);
 
   return (
     <>
@@ -163,7 +98,7 @@ export default async function page() {
                           can view.
                         </p>
                         <p className="text-sm text-muted-foreground">
-                         (Click with the right button to download and others options)
+                         (Click with the right button to others options)
                         </p>
                       </div>
                       <Separator className="my-4" />

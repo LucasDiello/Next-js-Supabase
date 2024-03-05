@@ -36,16 +36,15 @@ export function AlbumArtwork({
   const supabase = createClientComponentClient();
 
   const handleDelete = async (nameImage: string) => {
-    console.log("handleDelete", nameImage);
     const { error } = await supabase.storage
       .from(process.env.NEXT_PUBLIC_SUPABASE_APP_BUCKET_IMAGE_FOLDER)
       .remove([
-        `${process.env.NEXT_PUBLIC_SUPABASE_APP_BUCKET_IMAGE_FOLDER_RESTORED}/image/${nameImage}`,
+        `${process.env.NEXT_PUBLIC_SUPABASE_APP_BUCKET_IMAGE_FOLDER_RESTORED}/image/${userName}/${nameImage}`,
       ]);
     const { error: erro2 } = await supabase.storage
       .from(process.env.NEXT_PUBLIC_SUPABASE_APP_BUCKET_IMAGE_FOLDER)
       .remove([
-        `${process.env.NEXT_PUBLIC_SUPABASE_APP_BUCKET_IMAGE_FOLDER_PROCESSING}/${nameImage}`,
+        `${process.env.NEXT_PUBLIC_SUPABASE_APP_BUCKET_IMAGE_FOLDER_PROCESSING}/${userName}/${nameImage}`,
       ]);
 
     router.refresh();
@@ -55,20 +54,19 @@ export function AlbumArtwork({
     }
   };
 
-  const handleMyCollection = async () => {
+  const handlePackaging = async (env : string) => {
     const { error } = await supabase.storage.from(process.env.NEXT_PUBLIC_SUPABASE_APP_BUCKET_IMAGE_FOLDER).upload(
-      `${process.env.NEXT_PUBLIC_SUPABASE_APP_BUCKET_IMAGE_FOLDER_COLLECTIONS}/${userName}/${nameImage}`,
+      `${env}/${userName}/${nameImage}`,
       publicUrl
     )
 
     router.refresh();
 
     if (error) {
-      console.error("MyCollections", error);
+      console.error("packagingImage", error);
     }
-
-
   }
+
 
   return (
     <div className={cn("space-y-3", className)} {...props}>
@@ -89,15 +87,19 @@ export function AlbumArtwork({
           </div>
         </ContextMenuTrigger>
         <ContextMenuContent className="w-40">
-          <ContextMenuItem onClick={handleMyCollection}>
+          <ContextMenuItem onClick={() => {
+            handlePackaging(process.env.NEXT_PUBLIC_SUPABASE_APP_BUCKET_IMAGE_FOLDER_COLLECTIONS)
+          }}>
             Add to Collection
           </ContextMenuItem>
           <ContextMenuSub>
-            <ContextMenuSubTrigger>Add to Photos</ContextMenuSubTrigger>
+            <ContextMenuSubTrigger>Add to Favorites</ContextMenuSubTrigger>
             <ContextMenuSubContent className="w-48">
-              <ContextMenuItem>
+              <ContextMenuItem onClick={() => {
+                handlePackaging(process.env.NEXT_PUBLIC_SUPABASE_APP_BUCKET_IMAGE_FOLDER_FAVORITES)
+              }}>
                 <PlusCircleIcon className="mr-2 h-4 w-4" />
-                New Collection
+                New favorite
               </ContextMenuItem>
               <ContextMenuSeparator />
             </ContextMenuSubContent>
@@ -122,7 +124,7 @@ export function AlbumArtwork({
         </ContextMenuContent>
       </ContextMenu>
       <div className="space-y-1 text-sm flex justify-between items-center">
-        <p>made in: <span className="font-bold">{userName}</span></p>
+        <p>created by: <span className="font-bold">{userName}</span></p>
         {liked ? <ThumbsUp/> : <ThumbsDown/>}
       </div>
     </div>

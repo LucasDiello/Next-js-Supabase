@@ -97,7 +97,7 @@ export default function CreateAccountForm() {
               </FormItem>
             )}
           />
-          <Button type="submit">Create Account</Button>
+          <Button type="submit" className="bg-teal-900">Create Account</Button>
         </form>
       </Form>
     </div>

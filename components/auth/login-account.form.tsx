@@ -97,7 +97,7 @@ export default function LoginAccountForm() {
               </FormItem>
             )}
           />
-          <Button type="submit">Login</Button>
+          <Button type="submit" className="bg-teal-900">Login</Button>
         </form>
       </Form>
     </div>
