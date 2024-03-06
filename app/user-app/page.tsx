@@ -13,7 +13,6 @@ import { ImageUploadPlaceholder } from "@/components/user-app/img-uploader-place
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { AlbumArtwork } from "@/components/user-app/user-app-image";
 import handleStorage from "@/lib/handleStorage";
-import Footer from "@/components/footer/footer";
 
 export default async function page() {
   let loggedIn = false;

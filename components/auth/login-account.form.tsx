@@ -58,12 +58,12 @@ export default function LoginAccountForm() {
   };
 
   return (
-    <div className="flex flex-col justify-center items-center space-y-2">
-      <span className="text-lg">{"It's good to see you again!"}</span>
+    <div className="flex flex-col p-10 space-y-2">
+      <span className="text-2xl mb-10 font-extralight border-b-2 text-center p-2">{"It's good to see you again!"}</span>
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="flex flex-col space-y-2"
+          className="flex flex-col space-y-10"
         >
           <FormField
             control={form.control}

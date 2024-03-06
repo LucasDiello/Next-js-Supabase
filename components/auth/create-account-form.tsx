@@ -58,12 +58,12 @@ export default function CreateAccountForm() {
   };
 
   return (
-    <div className="flex flex-col justify-center items-center space-y-2">
-      <span className="text-lg">You will love it</span>
+    <div className="flex flex-col p-10 space-y-2 ">
+      <span className="text-2xl mb-10 font-extralight border-b-2 text-center p-2">You will love it</span>
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="flex flex-col space-y-2"
+          className="flex flex-col space-y-10"
         >
           <FormField
             control={form.control}
@@ -97,7 +97,7 @@ export default function CreateAccountForm() {
               </FormItem>
             )}
           />
-          <Button type="submit" className="bg-teal-900">Create Account</Button>
+          <Button type="submit" className="bg-teal-900  ">Create Account</Button>
         </form>
       </Form>
     </div>

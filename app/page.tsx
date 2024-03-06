@@ -48,7 +48,7 @@ export default async function page() {
           </span>
         </div>
         <div className=" absolute bottom-0 z-50 p-20 w-full">
-          <p className="text-white">
+          <p className="text-[10px] text-white tracking-wider">
             This is a personal project and is not complete. It is a work in
             progress <br />
             and is not meant to be used as a finished product. <br />
@@ -56,10 +56,10 @@ export default async function page() {
           </p>
           <div className="flex my-8">
             <a href="" className="mr-4" target="_blank">
-              <Linkedin color="white" />
+              <Linkedin color="white" size={20} />
             </a>
             <a href="" target="_blank">
-              <GithubIcon color="white" />
+              <GithubIcon color="white" size={20}/>
             </a>
           </div>
         </div>
@@ -67,7 +67,7 @@ export default async function page() {
       <div className="lg:p-20 h-full flex justify-center items-center">
         <Tabs
           defaultValue="create-account"
-          className="w-[400px] h-full border rounded-md pb-4 shadow-2xl"
+          className="w-[400px] h-full border rounded-md shadow-2xl"
         >
           <TabsList className="flex justify-around items-center rounded-b-none h-14">
             <TabsTrigger
