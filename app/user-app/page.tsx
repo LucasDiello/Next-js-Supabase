@@ -38,7 +38,6 @@ export default async function page() {
     process.env.NEXT_PUBLIC_SUPABASE_APP_BUCKET_IMAGE_FOLDER_COLLECTIONS,
     true)
 
-  console.log(imagesCollections);
   
   const imagesRestored = await handleStorage(process.env.NEXT_PUBLIC_SUPABASE_APP_BUCKET_IMAGE_FOLDER_RESTORED);
 

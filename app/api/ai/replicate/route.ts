@@ -14,8 +14,6 @@ export async function POST(req: NextRequestWithImage, res: NextResponse) {
     const {data: {session}, error} = await supabase.auth.getSession();
 
     if(!session || error) new NextResponse("Login in order to use restore", {status: 500});
-    console.log(imageUrl)
-    console.log(process.env.REPLICATE_API_TOKEN)
     const startRestoreProcess = await fetch("https://api.claid.ai/v1-beta1/image/edit",
     {
         method: "POST",

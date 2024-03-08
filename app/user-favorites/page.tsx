@@ -6,7 +6,6 @@ import handleStorage from "@/lib/handleStorage";
 export default async function page() {
 
   const imagesRestored = await handleStorage(process.env.NEXT_PUBLIC_SUPABASE_APP_BUCKET_IMAGE_FOLDER_FAVORITES, process.env.NEXT_PUBLIC_SUPABASE_APP_BUCKET_IMAGE_FOLDER_FAVORITES, true);
-    console.log(imagesRestored);
   return (
     <div>
       <UserAppHeader />

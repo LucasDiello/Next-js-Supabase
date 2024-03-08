@@ -45,7 +45,7 @@ export function AlbumArtwork({
       .from(process.env.NEXT_PUBLIC_SUPABASE_APP_BUCKET_IMAGE_FOLDER)
       .remove([
         `${process.env.NEXT_PUBLIC_SUPABASE_APP_BUCKET_IMAGE_FOLDER_PROCESSING}/${userName}/${nameImage}`,
-      ]);
+      ]); 
 
     router.refresh();
 
