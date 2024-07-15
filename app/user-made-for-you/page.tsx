@@ -1,8 +1,6 @@
 import UserAppHeader from "@/components/user-app/user-app-header";
 import { AlbumArtwork } from "@/components/user-app/user-app-image";
 import { Sidebar } from "@/components/user-app/user-app-sidebar";
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
-import { cookies } from "next/headers";
 import handleStorage from "@/lib/handleStorage";
 
 export default async function page() {

@@ -48,9 +48,12 @@ export default function LoginAccountForm() {
         email,
         password,
       });
+      const newError = error?.message + " or email is not verified";
       if (user) {
         form.reset();
         router.refresh();
+      } else {
+        alert(newError);
       }
     } catch (e) {
       console.error("LoginAccountForm", e);

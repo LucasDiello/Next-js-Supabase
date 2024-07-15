@@ -25,14 +25,17 @@ export function ImageUploadPlaceholder() {
   const [file, setFile] = useState<FilePreview | null>(null);
   const [fileToProcess, setFileToProcess] = useState<{ path: string } | null>();
   const [restoredFile, setRestoredFile] = useState<FilePreview | null>();
+  const [processingImage, setProcessingImage] = useState<Boolean>(false);
   const router = useRouter();
   
   const onDrop = useCallback(async (acceptedFiles: File[]) => {
-    const supabase = createClientComponentClient();
+    const supabase = createClientComponentClient(); 
     const {data: { user } } = await supabase.auth.getUser();
     const userName = user?.email?.split("@")[0];
+
     try {
       const file = acceptedFiles[0];
+      console.log("file", file)
       setFile({
         file,
         preview: URL.createObjectURL(file),
@@ -40,7 +43,7 @@ export function ImageUploadPlaceholder() {
 
       const { data, error } = await supabase.storage.from(process.env.NEXT_PUBLIC_SUPABASE_APP_BUCKET_IMAGE_FOLDER)
         .upload(`${process.env.NEXT_PUBLIC_SUPABASE_APP_BUCKET_IMAGE_FOLDER_PROCESSING}/${userName}/${acceptedFiles[0].name}`, acceptedFiles[0]);
-
+          console.log("DATA AQUI FDP", data)
         if (!error) {
         setFileToProcess(data);
       }
@@ -58,13 +61,6 @@ export function ImageUploadPlaceholder() {
     },
   });
 
-  useEffect(() => {
-    return () => {
-      if (file) URL.revokeObjectURL(file.preview);
-      if (restoredFile) URL.revokeObjectURL(restoredFile.preview);
-    };
-  }, [file, restoredFile]);
-  
 
   const handleDialog = async (e: boolean) => {
     if (!e) {
@@ -75,11 +71,14 @@ export function ImageUploadPlaceholder() {
   };
 
   const handleEnhance = async () => {
+    console.log(processingImage)
+    setProcessingImage(true);
     const supabase = createClientComponentClient();
     const {data: { user } } = await supabase.auth.getUser();
     const userName = user?.email?.split("@")[0];
     try {
-      const { data: { publicUrl } } = supabase.storage.from(`images/`)
+      console.log("fileToProcess", fileToProcess?.path)
+      const { data: { publicUrl } } = supabase.storage.from(`images`)
         .getPublicUrl(`${fileToProcess?.path}`);
 
       const response = await fetch("/api/ai/replicate", {
@@ -91,16 +90,13 @@ export function ImageUploadPlaceholder() {
       });
 
       const restoredImageUrl = await response.json();
-      
-
       const blob = restoredImageUrl.data;
 
       setRestoredFile({
         file: blob,
         preview: blob,
       });
-
-      
+      setProcessingImage(false);
       const { data: uploadData, error: uploadError } = await supabase.storage.from(process.env.NEXT_PUBLIC_SUPABASE_APP_BUCKET_IMAGE_FOLDER)
         .upload(`${process.env.NEXT_PUBLIC_SUPABASE_APP_BUCKET_IMAGE_FOLDER_RESTORED}/image/${userName}/${file?.file?.name}`, blob);
 
@@ -114,7 +110,8 @@ export function ImageUploadPlaceholder() {
       setRestoredFile(null);
     }
   };
-
+  console.log(processingImage)
+  console.log(restoredFile)
   return (
     <div className="flex h-[450px] w-full shrink-0 items-center justify-center rounded-md border border-dashed">
       <div className="mx-auto flex max-w-[420px] flex-col items-center justify-center text-center">
@@ -195,7 +192,13 @@ export function ImageUploadPlaceholder() {
               </div>
             </div>
             <DialogFooter>
-              <Button onClick={handleEnhance}>Enhance.</Button>
+            {
+            !processingImage ? (
+              <Button onClick={handleEnhance}>Enhance.</Button>)
+              : (
+                <Button disabled>Processing...</Button>
+              )
+            }
             </DialogFooter>
           </DialogContent>
         </Dialog>
