@@ -9,6 +9,7 @@ interface NextRequestWithImage extends NextRequest {
 export async function POST(req: NextRequestWithImage, res: NextResponse) {
   const { imageUrl } = await req.json();
   const supabase = createRouteHandlerClient({ cookies });
+  console.log("imageUrl", imageUrl);
   const {
     data: { session },
     error,
@@ -50,8 +51,10 @@ export async function POST(req: NextRequestWithImage, res: NextResponse) {
     }
   );
   let jsonStartProcess = await startRestoreProcess.json();
+  console.log("jsonStartProcess", jsonStartProcess);
   let endpoint = jsonStartProcess.urls.get;
 
+  console.log("endpoint", endpoint);
   let restoredImage : string | null = null;
   while (!restoredImage) {
     console.log("waiting for image")
