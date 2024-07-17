@@ -1,9 +1,7 @@
 {
     "functions": {
-      "api/ai/replicate/post": {
-        "runtime": "node@20.x",
+      "app/api/**/*": {
         "maxDuration": 60
       }
     }
   }
-  
