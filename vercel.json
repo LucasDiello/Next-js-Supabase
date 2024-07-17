@@ -1,0 +1,9 @@
+{
+    "functions": {
+      "api/post": {
+        "runtime": "nodejs14.x",
+        "maxDuration": 60
+      }
+    }
+  }
+  
