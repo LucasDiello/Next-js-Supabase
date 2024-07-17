@@ -9,7 +9,6 @@ interface NextRequestWithImage extends NextRequest {
 export async function POST(req: NextRequestWithImage, res: NextResponse) {
   const { imageUrl } = await req.json();
   const supabase = createRouteHandlerClient({ cookies });
-  console.log("imageUrl", imageUrl);
   const {
     data: { session },
     error,
@@ -51,14 +50,11 @@ export async function POST(req: NextRequestWithImage, res: NextResponse) {
     }
   );
   let jsonStartProcess = await startRestoreProcess.json();
-  console.log("jsonStartProcess", jsonStartProcess);
   let endpoint = jsonStartProcess.urls.get;
 
-  console.log("endpoint", endpoint);
   let restoredImage : string | null = null;
   while (!restoredImage) {
     console.log("waiting for image")
-
     let finalResponse = await fetch(endpoint, 
       {
         method: "GET",
@@ -74,11 +70,10 @@ export async function POST(req: NextRequestWithImage, res: NextResponse) {
     } else if (jsonFinalResponse.status === "failed") {
       break;
     } else {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 5000));
     }
   }
 
-  console.log("restoredImage", restoredImage);
   return NextResponse.json(
     { data: restoredImage ? restoredImage : "failed to restored" },
     { status: 200 }

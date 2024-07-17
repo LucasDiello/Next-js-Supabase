@@ -6,7 +6,7 @@ import handleStorage from "@/lib/handleStorage";
 export default async function page() {
 
   const imagesRestored = await handleStorage(process.env.NEXT_PUBLIC_SUPABASE_APP_BUCKET_IMAGE_FOLDER_RESTORED);
-
+  console.log("imagesRestored", imagesRestored)
   return (
     <div>
       <UserAppHeader />
@@ -20,7 +20,7 @@ export default async function page() {
           </p>
           </div>
           <div className="flex space-x-4 pb-4 flex-wrap">
-            {
+            { imagesRestored ?
               imagesRestored.map((image: any, index) => {
                 return (
                   <AlbumArtwork
@@ -31,7 +31,7 @@ export default async function page() {
                     userName={image.username}
                   />
                 );
-              })
+              }) : "No images restored yet"
             }
           </div>
         </div>

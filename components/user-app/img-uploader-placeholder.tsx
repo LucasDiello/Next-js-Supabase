@@ -110,8 +110,7 @@ export function ImageUploadPlaceholder() {
       setRestoredFile(null);
     }
   };
-  console.log(processingImage)
-  console.log(restoredFile)
+  console.log("restoredFile", restoredFile)
   return (
     <div className="flex h-[450px] w-full shrink-0 items-center justify-center rounded-md border border-dashed">
       <div className="mx-auto flex max-w-[420px] flex-col items-center justify-center text-center">

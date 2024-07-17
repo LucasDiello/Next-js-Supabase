@@ -1,13 +1,14 @@
 "use client"
 
 
+import { User } from "@/types";
 import { createClientComponentClient} from "@supabase/auth-helpers-nextjs";
 import { useEffect } from "react";
 import { useState } from "react";
 
 export default function SearchUser() {
 
-    const [user, setUser] = useState(null);
+    const [user, setUser] = useState<User | null>(null);
     const supabase = createClientComponentClient();
 
     const getUser = async () => {

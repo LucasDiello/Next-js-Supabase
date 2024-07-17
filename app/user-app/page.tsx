@@ -18,7 +18,9 @@ export default async function page() {
   let loggedIn = false;
 
   const supabase = createServerComponentClient({ cookies });
-  const {data: {user}} = await supabase.auth.getUser() 
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   const userName = user?.email?.split("@")[0];
 
   try {
@@ -34,13 +36,15 @@ export default async function page() {
     if (!loggedIn) redirect("/", RedirectType.replace);
   }
 
-  const imagesCollections = await handleStorage(process.env.NEXT_PUBLIC_SUPABASE_APP_BUCKET_IMAGE_FOLDER_COLLECTIONS,
+  const imagesCollections = await handleStorage(
     process.env.NEXT_PUBLIC_SUPABASE_APP_BUCKET_IMAGE_FOLDER_COLLECTIONS,
-    true)
+    process.env.NEXT_PUBLIC_SUPABASE_APP_BUCKET_IMAGE_FOLDER_COLLECTIONS,
+    true
+  );
 
-  
-  const imagesRestored = await handleStorage(process.env.NEXT_PUBLIC_SUPABASE_APP_BUCKET_IMAGE_FOLDER_RESTORED);
-
+  const imagesRestored = await handleStorage(
+    process.env.NEXT_PUBLIC_SUPABASE_APP_BUCKET_IMAGE_FOLDER_RESTORED
+  );
   return (
     <>
       <div>
@@ -57,7 +61,9 @@ export default async function page() {
                         <TabsTrigger value="photos" className="relative">
                           Photos
                         </TabsTrigger>
-                        <TabsTrigger value="collections">My collection</TabsTrigger>
+                        <TabsTrigger value="collections">
+                          My collection
+                        </TabsTrigger>
                         <TabsTrigger value="other" disabled>
                           Other
                         </TabsTrigger>
@@ -92,11 +98,11 @@ export default async function page() {
                           Made for you
                         </h2>
                         <p className="text-sm text-muted-foreground">
-                          Here are the images that have been restored for you. You
-                          can view.
+                          Here are the images that have been restored for you.
+                          You can view.
                         </p>
                         <p className="text-sm text-muted-foreground">
-                         (Click with the right button to others options)
+                          (Click with the right button to others options)
                         </p>
                       </div>
                       <Separator className="my-4" />
@@ -104,11 +110,18 @@ export default async function page() {
                         <ScrollArea>
                           <div className="flex space-x-4 pb-4 flex-wrap">
                             {
-                              imagesRestored?.map((image, index) => (
-                                <AlbumArtwork key={index} publicUrl={image.publicUrl}
-                                 nameImage={image.name}
-                                 userName={userName || ""} />
-                              ))
+                              imagesRestored.map((image, index) => {
+                                if (image.publicUrl !== 'failed to restored') {
+                                  return (
+                                    <AlbumArtwork
+                                      key={index}
+                                      publicUrl={image.publicUrl}
+                                      nameImage={image.name}
+                                      userName={userName || ""}
+                                    />
+                                  );
+                                }
+                              })
                             }
                           </div>
                         </ScrollArea>
@@ -130,15 +143,21 @@ export default async function page() {
                       </div>
                       <Separator className="my-4" />
                       <div className="flex space-x-4 pb-4 flex-wrap">
-                          {
-                            imagesCollections?.map((image, index) => (
-                              <AlbumArtwork key={index} publicUrl={image.publicUrl}
-                               nameImage={image.name}
-                               userName={userName || ""} />
-                            ))
-                          
-                          }
-                          </div>
+                      {
+                              imagesCollections.map((image, index) => {
+                                if (image.publicUrl !== 'failed to restored') {
+                                  return (
+                                    <AlbumArtwork
+                                      key={index}
+                                      publicUrl={image.publicUrl}
+                                      nameImage={image.name}
+                                      userName={userName || ""}
+                                    />
+                                  );
+                                }
+                              })
+                            }
+                      </div>
                     </TabsContent>
                   </Tabs>
                 </div>

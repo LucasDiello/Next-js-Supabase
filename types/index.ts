@@ -8,4 +8,9 @@ interface FileObject {
     metadata: Record<string, unknown>;
 };
 
+
+export type User = {
+    email?: string;
+}
+
 export type restoredImage = FileObject;
