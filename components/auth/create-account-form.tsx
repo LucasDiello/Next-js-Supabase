@@ -1,4 +1,5 @@
-"use client";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -15,7 +16,6 @@ import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
-import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
   email: z
@@ -29,6 +29,7 @@ const formSchema = z.object({
 
 export default function CreateAccountForm() {
   const router = useRouter();
+  const [userCreated, setUserCreated] = useState<Boolean>(false);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -48,14 +49,26 @@ export default function CreateAccountForm() {
         email,
         password,
       });
+
+      if (error) {
+        console.error("Error signing up:", error);
+        return;
+      }
+
       if (user) {
-        form.reset();
-        router.push("/");
+        console.log("User created successfully:", user);
+        setUserCreated(true);
       }
     } catch (e) {
-      console.error(e);
+      console.error("Catch block error:", e);
     }
   };
+
+  useEffect(() => {
+    if (userCreated) {
+      router.push("/user-app");
+    }
+  }, [userCreated, router]);
 
   return (
     <div className="flex flex-col p-10 space-y-2 ">
@@ -97,7 +110,7 @@ export default function CreateAccountForm() {
               </FormItem>
             )}
           />
-          <Button type="submit" className="bg-teal-900  ">Create Account</Button>
+          <Button type="submit" className="bg-teal-900">Create Account</Button>
         </form>
       </Form>
     </div>
