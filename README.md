@@ -90,8 +90,3 @@ npm install
 ```bash
 npm run dev
 ```
-
-## Acesso ao protótipo
-
-## [www.futureImage.com](https://futureimage.netlify.app)
-
